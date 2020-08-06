@@ -256,6 +256,7 @@ public class TextEditor extends JFrame {
         regexCheckbox.addActionListener(e -> menuUseRegex.setSelected(!menuUseRegex.isSelected()));
 
         menuUndo = new JMenuItem("Undo") {
+            private static final long serialVersionUID = -843926481964895754L;
             {
                 setName("MenuUndo");
                 addActionListener(e -> {
@@ -269,6 +270,7 @@ public class TextEditor extends JFrame {
         };
 
         menuRedo = new JMenuItem("Redo") {
+            private static final long serialVersionUID = 7631745700972370457L;
             {
                 setName("MenuRedo");
                 addActionListener(e -> {
@@ -293,6 +295,7 @@ public class TextEditor extends JFrame {
         };
 
         final JMenu menuEdit = new JMenu("Edit") {
+            private static final long serialVersionUID = 2265046865722155417L;
             {
                 setName("MenuRedo");
                 add(menuUndo);
