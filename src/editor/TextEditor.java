@@ -3,6 +3,7 @@ package editor;
 import javax.swing.*;
 import javax.swing.event.DocumentEvent;
 import javax.swing.event.DocumentListener;
+import javax.swing.undo.UndoManager;
 import java.awt.*;
 import java.awt.event.ActionListener;
 import java.awt.event.InputEvent;
@@ -28,13 +29,15 @@ public class TextEditor extends JFrame {
     private final JTextArea textArea;
 
     /* Menus */
-    final JMenuItem menuOpen;
-    final JMenuItem menuSave;
-    final JMenuItem menuExit;
-    final JMenuItem menuStartSearch;
-    final JMenuItem menuPreviousMatch;
-    final JMenuItem menuNextMatch;
-    final JMenuItem menuUseRegex;
+    private final JMenuItem menuOpen;
+    private final JMenuItem menuSave;
+    private final JMenuItem menuExit;
+    private final JMenuItem menuStartSearch;
+    private final JMenuItem menuPreviousMatch;
+    private final JMenuItem menuNextMatch;
+    private final JMenuItem menuUseRegex;
+    private final JMenuItem menuUndo;
+    private final JMenuItem menuRedo;
 
     /* Icons */
     private final ImageIcon saveIcon = new ImageIcon("resource/save.png");
@@ -44,10 +47,11 @@ public class TextEditor extends JFrame {
     private final ImageIcon previousIcon = new ImageIcon("resource/previous.png");
 
     /* Search Fields */
+    private final SearchResultList searchResultList = new SearchResultList();
     private SearchWorker searchWorker;
-    protected final SearchResultList searchResultList = new SearchResultList();
 
     /* Other Fields */
+    private final UndoManager undoManager = new UndoManager();
     private String currentDirectory = System.getProperty("user.home");
     private String currentFileName = "Untitled";
 
@@ -109,6 +113,7 @@ public class TextEditor extends JFrame {
                     public void changedUpdate(DocumentEvent e) {
                     }
                 });
+                getDocument().addUndoableEditListener(undoManager);
             }
         };
 
@@ -250,6 +255,32 @@ public class TextEditor extends JFrame {
 
         regexCheckbox.addActionListener(e -> menuUseRegex.setSelected(!menuUseRegex.isSelected()));
 
+        menuUndo = new JMenuItem("Undo") {
+            {
+                setName("MenuUndo");
+                addActionListener(e -> {
+                    if (undoManager.canUndo()) {
+                        undoManager.undo();
+                    }
+                });
+                setAccelerator(
+                        KeyStroke.getKeyStroke(KeyEvent.VK_Z, Toolkit.getDefaultToolkit().getMenuShortcutKeyMaskEx()));
+            }
+        };
+
+        menuRedo = new JMenuItem("Redo") {
+            {
+                setName("MenuRedo");
+                addActionListener(e -> {
+                    if (undoManager.canRedo()) {
+                        undoManager.redo();
+                    }
+                });
+                setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_Z,
+                        InputEvent.SHIFT_DOWN_MASK | Toolkit.getDefaultToolkit().getMenuShortcutKeyMaskEx()));
+            }
+        };
+
         final JMenu menuFile = new JMenu("File") {
             private static final long serialVersionUID = -843926481964895754L;
             {
@@ -258,6 +289,14 @@ public class TextEditor extends JFrame {
                 add(menuSave);
                 addSeparator();
                 add(menuExit);
+            }
+        };
+
+        final JMenu menuEdit = new JMenu("Edit") {
+            {
+                setName("MenuRedo");
+                add(menuUndo);
+                add(menuRedo);
             }
         };
 
@@ -277,6 +316,7 @@ public class TextEditor extends JFrame {
             private static final long serialVersionUID = 5674099574201432610L;
             {
                 add(menuFile);
+                add(menuEdit);
                 add(menuSearch);
                 setVisible(true);
                 setOpaque(true);
