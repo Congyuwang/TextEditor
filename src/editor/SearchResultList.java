@@ -14,25 +14,25 @@ public class SearchResultList {
         numberOfResults = 0;
     }
 
-    void clear() {
+    protected void clear() {
         searchResultMap = new HashMap<>();
         currentSearchPosition = 0;
     }
 
-    synchronized void update(Map<Integer, SearchResult> newResult) {
+    protected synchronized void update(Map<Integer, SearchResult> newResult) {
         searchResultMap = newResult;
         currentSearchPosition = 0;
         numberOfResults = newResult.size();
     }
 
-    SearchResult next() {
+    protected SearchResult next() {
         if (++currentSearchPosition == numberOfResults) {
             currentSearchPosition = 0;
         }
         return searchResultMap.get(currentSearchPosition);
     }
 
-    SearchResult previous() {
+    protected SearchResult previous() {
         if (--currentSearchPosition < 0) {
             currentSearchPosition = numberOfResults - 1;
         }

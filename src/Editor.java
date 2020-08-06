@@ -1,7 +1,6 @@
-package editor;
+import editor.TextEditor;
 
-
-public class ApplicationRunner {
+public class Editor{
     public static void main(String[] args) {
         new TextEditor();
     }

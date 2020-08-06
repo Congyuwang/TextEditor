@@ -8,11 +8,11 @@ import java.util.regex.*;
 
 public class SearchWorker extends SwingWorker<Map<Integer, SearchResult>, SearchResult> {
 
-    final JTextArea textArea;
-    final String pattern;
-    final SearchResultList resultList;
-    final boolean useRegex;
-    volatile boolean isValid;
+    private final JTextArea textArea;
+    private final String pattern;
+    private final SearchResultList resultList;
+    private final boolean useRegex;
+    private volatile boolean isValid;
 
     SearchWorker(JTextArea textArea, SearchResultList resultList, String pattern, boolean useRegex) {
         this.textArea = textArea;

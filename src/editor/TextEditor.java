@@ -40,11 +40,11 @@ public class TextEditor extends JFrame {
     private final JMenuItem menuRedo;
 
     /* Icons */
-    private final ImageIcon saveIcon = new ImageIcon("resource/save.png");
-    private final ImageIcon openIcon = new ImageIcon("resource/open.png");
-    private final ImageIcon searchIcon = new ImageIcon("resource/search.png");
-    private final ImageIcon nextIcon = new ImageIcon("resource/next.png");
-    private final ImageIcon previousIcon = new ImageIcon("resource/previous.png");
+    private final ImageIcon saveIcon;
+    private final ImageIcon openIcon;
+    private final ImageIcon searchIcon;
+    private final ImageIcon nextIcon;
+    private final ImageIcon previousIcon;
 
     /* Search Fields */
     private final SearchResultList searchResultList = new SearchResultList();
@@ -68,6 +68,12 @@ public class TextEditor extends JFrame {
                 e1.printStackTrace();
             }
         }
+
+        saveIcon = new ImageIcon(getClass().getResource("/resource/save.png"));
+        openIcon = new ImageIcon(getClass().getResource("/resource/open.png"));
+        searchIcon = new ImageIcon(getClass().getResource("/resource/search.png"));
+        nextIcon = new ImageIcon(getClass().getResource("/resource/next.png"));
+        previousIcon = new ImageIcon(getClass().getResource("/resource/previous.png"));
 
         SpringLayout mainLayout = new SpringLayout();
 
@@ -435,7 +441,7 @@ public class TextEditor extends JFrame {
 
         /* set properties for JFrame */
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-        setSize(400, 480);
+        setSize(640, 480);
         setTitle("Text Editor");
         add(optionPanel);
         add(textPane);
