@@ -9,8 +9,9 @@ import java.awt.event.ActionListener;
 import java.awt.event.InputEvent;
 import java.awt.event.KeyEvent;
 import java.io.IOException;
+import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
-import java.nio.file.Path;
+import java.nio.file.Paths;
 
 public class TextEditor extends JFrame {
 
@@ -54,11 +55,14 @@ public class TextEditor extends JFrame {
     private final UndoManager undoManager = new UndoManager();
     private String currentDirectory = System.getProperty("user.home");
     private String currentFileName = "Untitled";
+    private final int defaultAccelerator;
 
     public TextEditor() {
 
+        final boolean isMacOs = System.getProperty("os.name").toLowerCase().startsWith("mac os x");
+
         // set to MacOs look and feel
-        if (System.getProperty("os.name").toLowerCase().startsWith("mac os x")) {
+        if (isMacOs) {
             System.setProperty("apple.laf.useScreenMenuBar", "true");
             System.setProperty("com.apple.mrj.application.apple.menu.about.name", "Text Editor");
             try {
@@ -68,6 +72,8 @@ public class TextEditor extends JFrame {
                 e1.printStackTrace();
             }
         }
+
+        defaultAccelerator = isMacOs ? InputEvent.META_DOWN_MASK : InputEvent.CTRL_DOWN_MASK;
 
         saveIcon = new ImageIcon(getClass().getResource("/resource/save.png"));
         openIcon = new ImageIcon(getClass().getResource("/resource/open.png"));
@@ -106,6 +112,7 @@ public class TextEditor extends JFrame {
                         if (searchWorker != null) {
                             searchWorker.restart();
                         }
+                        searchResultList.clear();
                     }
 
                     @Override
@@ -113,6 +120,7 @@ public class TextEditor extends JFrame {
                         if (searchWorker != null) {
                             searchWorker.restart();
                         }
+                        searchResultList.clear();
                     }
 
                     @Override
@@ -140,7 +148,8 @@ public class TextEditor extends JFrame {
                 currentFileName = fileDialog.getFile();
                 String fileName = currentDirectory + currentFileName;
                 try {
-                    textArea.setText(Files.readString(Path.of(fileName)));
+                    textArea.setText(new String(Files.readAllBytes(Paths.get(fileName)), StandardCharsets.UTF_8));
+                    undoManager.discardAllEdits();
                 } catch (IOException ioException) {
                     ioException.printStackTrace();
                 }
@@ -157,7 +166,7 @@ public class TextEditor extends JFrame {
                 currentFileName = fileDialog.getFile();
                 String fileName = currentDirectory + currentFileName;
                 try {
-                    Files.writeString(Path.of(fileName), textArea.getText());
+                    Files.write(Paths.get(fileName), textArea.getText().getBytes(StandardCharsets.UTF_8));
                 } catch (IOException ioException) {
                     ioException.printStackTrace();
                 }
@@ -196,7 +205,7 @@ public class TextEditor extends JFrame {
             {
                 setName("MenuOpen");
                 setAccelerator(
-                        KeyStroke.getKeyStroke(KeyEvent.VK_O, Toolkit.getDefaultToolkit().getMenuShortcutKeyMaskEx()));
+                        KeyStroke.getKeyStroke(KeyEvent.VK_O, defaultAccelerator));
                 addActionListener(loadAction);
             }
         };
@@ -206,7 +215,7 @@ public class TextEditor extends JFrame {
             {
                 setName("MenuSave");
                 setAccelerator(
-                        KeyStroke.getKeyStroke(KeyEvent.VK_S, Toolkit.getDefaultToolkit().getMenuShortcutKeyMaskEx()));
+                        KeyStroke.getKeyStroke(KeyEvent.VK_S, defaultAccelerator));
                 addActionListener(saveAction);
             }
         };
@@ -216,7 +225,7 @@ public class TextEditor extends JFrame {
             {
                 setName("MenuExit");
                 setAccelerator(
-                        KeyStroke.getKeyStroke(KeyEvent.VK_Q, Toolkit.getDefaultToolkit().getMenuShortcutKeyMaskEx()));
+                        KeyStroke.getKeyStroke(KeyEvent.VK_Q, defaultAccelerator));
                 addActionListener(e -> System.exit(0));
             }
         };
@@ -226,7 +235,7 @@ public class TextEditor extends JFrame {
             {
                 setName("MenuStartSearch");
                 setAccelerator(
-                        KeyStroke.getKeyStroke(KeyEvent.VK_F, Toolkit.getDefaultToolkit().getMenuShortcutKeyMaskEx()));
+                        KeyStroke.getKeyStroke(KeyEvent.VK_F, defaultAccelerator));
                 addActionListener(searchAction);
             }
         };
@@ -236,7 +245,7 @@ public class TextEditor extends JFrame {
             {
                 setName("MenuPreviousMatch");
                 setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_G,
-                        InputEvent.SHIFT_DOWN_MASK | Toolkit.getDefaultToolkit().getMenuShortcutKeyMaskEx()));
+                        InputEvent.SHIFT_DOWN_MASK | defaultAccelerator));
                 addActionListener(previousAction);
             }
         };
@@ -246,7 +255,7 @@ public class TextEditor extends JFrame {
             {
                 setName("MenuNextMatch");
                 setAccelerator(
-                        KeyStroke.getKeyStroke(KeyEvent.VK_G, Toolkit.getDefaultToolkit().getMenuShortcutKeyMaskEx()));
+                        KeyStroke.getKeyStroke(KeyEvent.VK_G, defaultAccelerator));
                 addActionListener(nextAction);
             }
         };
@@ -268,10 +277,14 @@ public class TextEditor extends JFrame {
                 addActionListener(e -> {
                     if (undoManager.canUndo()) {
                         undoManager.undo();
+                        searchResultList.clear();
+                        if (searchWorker != null) {
+                            searchWorker.restart();
+                        }
                     }
                 });
                 setAccelerator(
-                        KeyStroke.getKeyStroke(KeyEvent.VK_Z, Toolkit.getDefaultToolkit().getMenuShortcutKeyMaskEx()));
+                        KeyStroke.getKeyStroke(KeyEvent.VK_Z, defaultAccelerator));
             }
         };
 
@@ -282,10 +295,14 @@ public class TextEditor extends JFrame {
                 addActionListener(e -> {
                     if (undoManager.canRedo()) {
                         undoManager.redo();
+                        searchResultList.clear();
+                        if (searchWorker != null) {
+                            searchWorker.restart();
+                        }
                     }
                 });
                 setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_Z,
-                        InputEvent.SHIFT_DOWN_MASK | Toolkit.getDefaultToolkit().getMenuShortcutKeyMaskEx()));
+                        InputEvent.SHIFT_DOWN_MASK | defaultAccelerator));
             }
         };
 

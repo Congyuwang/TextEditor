@@ -37,10 +37,8 @@ public class SearchWorker extends SwingWorker<Map<Integer, SearchResult>, Search
 
     @Override
     protected void done() {
-        System.out.print("SearchWorker: done.");
         try {
             if (isValid) {
-                System.out.print("SearchWorker: done and valid");
                 if (get().size() > 0) {
                     textArea.setCaretPosition(get().get(0).end);
                     textArea.select(get().get(0).start, get().get(0).end);
