@@ -174,6 +174,10 @@ public class TextEditor extends JFrame {
         };
 
         searchAction = e -> {
+            if ("".equals(searchField.getText())) {
+                searchField.grabFocus();
+                return;
+            }
             searchWorker = new SearchWorker(textArea, searchResultList, searchField.getText(),
                     regexCheckbox.isSelected());
             searchWorker.execute();
